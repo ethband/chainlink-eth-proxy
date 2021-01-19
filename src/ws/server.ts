@@ -1,35 +1,50 @@
-import { connection as Connection, request as Request, server as WebSocketServer } from 'websocket';
+import {
+  connection as Connection,
+  request as Request,
+  server as WebSocketServer,
+} from 'websocket';
 import { Observable, Subject } from 'rxjs';
-import { ObservableConnection } from './connection';
+import { ReactiveConnection } from './connection';
 
-export class ObservableWebSocketServer {
-    private server: WebSocketServer;
+export class ReactiveWebSocketServer {
+  private server: WebSocketServer;
 
-    constructor(server: WebSocketServer) {
-        this.server = server;
-    }
+  constructor(server: WebSocketServer) {
+    this.server = server;
+  }
 
-    request$(): Observable<Request> {
-        const subject = new Subject<Request>();
-        this.server.on('request', (request: Request) => {
-            subject.next(request);
-        });
-        return subject;
-    }
+  request$(): Observable<Request> {
+    const subject = new Subject<Request>();
+    this.server.on('request', (request: Request) => {
+      subject.next(request);
+    });
+    return subject;
+  }
 
-    connection$(): Observable<ObservableConnection> {
-        const subject = new Subject<ObservableConnection>();
-        this.server.on('connect', (connection: Connection) => {
-            subject.next(new ObservableConnection(connection));
-        });
-        return subject;
-    }
+  connection$(): Observable<ReactiveConnection> {
+    const subject = new Subject<ReactiveConnection>();
+    this.server.on('connect', (connection: Connection) => {
+      subject.next(new ReactiveConnection(connection));
+    });
+    return subject;
+  }
 
-    close$(): Observable<{ connection: Connection; reason: number; desc: string }> {
-        const subject = new Subject<{ connection: Connection; reason: number; desc: string }>();
-        this.server.on('close', (connection: Connection, reason: number, desc: string) => {
-            subject.next({ connection, reason, desc });
-        });
-        return subject;
-    }
+  close$(): Observable<{
+    connection: Connection;
+    reason: number;
+    desc: string;
+  }> {
+    const subject = new Subject<{
+      connection: Connection;
+      reason: number;
+      desc: string;
+    }>();
+    this.server.on(
+      'close',
+      (connection: Connection, reason: number, desc: string) => {
+        subject.next({ connection, reason, desc });
+      },
+    );
+    return subject;
+  }
 }
