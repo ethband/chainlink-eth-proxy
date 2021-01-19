@@ -1,6 +1,6 @@
-import {createLogger, format, transports} from 'winston';
+import { createLogger, format, transports } from 'winston';
 
-const layout = format.printf(({level, message, label, timestamp}) => {
+const layout = format.printf(({ level, message, label, timestamp }) => {
     return `${timestamp} ${level}: ${message}`;
 });
 
